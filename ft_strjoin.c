@@ -1,26 +1,41 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.h                                    :+:      :+:    :+:   */
+/*   ft_strjoin.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: nmashimb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/06/25 12:32:38 by nmashimb          #+#    #+#             */
-/*   Updated: 2019/06/25 16:16:42 by nmashimb         ###   ########.fr       */
+/*   Created: 2019/06/03 15:58:52 by nmashimb          #+#    #+#             */
+/*   Updated: 2019/06/25 12:43:08 by nmashimb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef GET_NEXT_LINE_H
-# define GET_NEXT_LINE_H
+#include "get_next_line.h"
 
-#include <string.h>
-#include <stdlib.h> //free/malloc 
-#include <unistd.h> //read
+char	*ft_strjoin(char const *s1, char const *s2)
+{
+	char	*str;
+	size_t	len;
 
-#define BUFF_SIZE 10
-#define MAX_BUFF 1024 + 1
-
-int   get_next_line(const int fd, char **line);
-char	*ft_strjoin(char const *s1, char const *s2);
-
-#endif
+	if (!s1 || !s2)
+		return (NULL);
+	len = strlen(s1) + strlen(s2);
+	str = (char *)malloc(len + 1);
+	if (!str)
+		return (NULL);
+	while (*s1)
+	{
+		*str = *s1;
+		s1++;
+		str++;
+	}
+	while (*s2)
+	{
+		*str = *s2;
+		s2++;
+		str++;
+	}
+	*str = '\0';
+	str = str - len;
+	return (str);
+}
