@@ -6,7 +6,7 @@
 /*   By: nmashimb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/06/19 13:42:49 by nmashimb          #+#    #+#             */
-/*   Updated: 2019/06/25 17:25:43 by nmashimb         ###   ########.fr       */
+/*   Updated: 2019/06/26 17:28:34 by nmashimb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,6 @@ int		check_nl(char **stack, char **line)
 	*endof_ln = '\0';
 	*line = strdup(*stack); //change me
 	*stack = strdup(endof_ln + 1); //change me
-	printf("%zu\n", i);
 	return (1);
 }
 
@@ -63,39 +62,35 @@ int		update_stack(int fd, char **stack, char **line, char *buff)
 	return (ret);
 }
 
-/*int		get_next_line(const int fd, char **line)
+int		get_next_line(const int fd, char **line)
 {
-	char	*buff;
-
-	if (( fd < 0 || fd <= MAX_FD) || (!(buff = (char *)malloc(BUFF_SIZE + 1)))\ 
+	static char	*stack[MAX_FD];
+	char		*buff;
+	int 		ret;
+	if (( fd < 0 || fd > MAX_FD) || (!(buff = (char *)malloc(BUFF_SIZE + 1)))\
 			|| line == NULL || read(fd, stack[fd], 0) < 0) //why stack[fd]
 		return (-1);
-	bzero(buff, BUFF_SIZE - 1);
-	ret = update_stack(fd, stack[fd], line, buff); //updates stack: add content with \n
+	if (*stack)
+	{
+		if ((check_nl(stack, line)) == 1)
+			return (1);
+	}
+	//bzero(buff, BUFF_SIZE);
+	ret = update_stack(fd, &stack[fd], line, buff); //updates stack: add content with \n
 	free(buff);
-
-}*/
+	buff = NULL;
+	if (stack[fd][0] == '\0')
+		return (0);
+	return 0;
+}
 
 int		main()
 {
 	int fd = open("text.txt", O_RDONLY);
-	static char		*stack[MAX_BUFF];
-	char			*buff = NULL;
-	char			**line = NULL;
-	//int i = 0;
+	char			*line = NULL;
 
-	//if (!(buff = (char *)malloc(BUFF_SIZE + 1)))
-	//	return -1;
-	//while (i < 10)
-	//	buff[i++] = '\0';
+	int x = get_next_line(fd, &line);
 
-	if (!(buff = (char *)malloc(BUFF_SIZE + 1)))
-		return (0);
-	bzero(buff, BUFF_SIZE);
-	int ret = update_stack(fd, &stack[fd], line, buff);
-	//int ret = read(fd, buff, BUFF_SIZE);
-	//buff[ret] = '\0';
-	//*stack = strdup(buff);
-	printf("%s\n", *line);
+	//printf("%d\n", x);
 	return 0;
 }
