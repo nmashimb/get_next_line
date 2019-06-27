@@ -6,7 +6,7 @@
 /*   By: nmashimb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/06/19 13:42:49 by nmashimb          #+#    #+#             */
-/*   Updated: 2019/06/26 17:28:34 by nmashimb         ###   ########.fr       */
+/*   Updated: 2019/06/27 18:02:35 by nmashimb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ int		check_nl(char **stack, char **line)
 
 	i = 0;
 	nl_pntr = *stack;
+	nl_pntr[(strlen(nl_pntr) - 1)] = '\0'; //added
 	while (nl_pntr[i] != '\n')
 	{
 		if (nl_pntr[i] == '\0')
@@ -54,7 +55,7 @@ int		update_stack(int fd, char **stack, char **line, char *buff)
 		}
 		else
 			*stack = strdup(buff); //change me
-		if (check_nl(stack, line))
+		if ((check_nl(stack, line)) == 1)
 			break;
 	}
 	if (ret > 0)
@@ -67,6 +68,7 @@ int		get_next_line(const int fd, char **line)
 	static char	*stack[MAX_FD];
 	char		*buff;
 	int 		ret;
+
 	if (( fd < 0 || fd > MAX_FD) || (!(buff = (char *)malloc(BUFF_SIZE + 1)))\
 			|| line == NULL || read(fd, stack[fd], 0) < 0) //why stack[fd]
 		return (-1);
@@ -75,13 +77,20 @@ int		get_next_line(const int fd, char **line)
 		if ((check_nl(stack, line)) == 1)
 			return (1);
 	}
-	//bzero(buff, BUFF_SIZE);
+	//bzero(buff, BUFF_SIZE); //optional?
 	ret = update_stack(fd, &stack[fd], line, buff); //updates stack: add content with \n
 	free(buff);
 	buff = NULL;
-	if (stack[fd][0] == '\0')
-		return (0);
-	return 0;
+	//case where theres nothing in file ?
+	if (ret != 0 || stack[fd][0] == '\0'  || stack[fd] == NULL)
+	{
+		if (ret == 0 && *line) //and line exist?
+			*line = NULL;
+		return (ret);
+	}
+	*line = stack[fd]; //allocating last line
+	stack[fd] = NULL;
+	return (1);
 }
 
 int		main()
