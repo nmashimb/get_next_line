@@ -6,7 +6,7 @@
 /*   By: nmashimb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/06/25 12:32:38 by nmashimb          #+#    #+#             */
-/*   Updated: 2019/06/25 16:16:42 by nmashimb         ###   ########.fr       */
+/*   Updated: 2019/06/27 10:06:52 by nmashimb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 #include <unistd.h> //read
 
 #define BUFF_SIZE 10
-#define MAX_BUFF 1024 + 1
+#define MAX_FD 1024 + 1
 
 int   get_next_line(const int fd, char **line);
 char	*ft_strjoin(char const *s1, char const *s2);
