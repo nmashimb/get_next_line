@@ -6,7 +6,7 @@
 /*   By: nmashimb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/06/19 13:42:49 by nmashimb          #+#    #+#             */
-/*   Updated: 2019/06/27 18:02:35 by nmashimb         ###   ########.fr       */
+/*   Updated: 2019/06/28 13:15:51 by nmashimb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,8 +84,8 @@ int		get_next_line(const int fd, char **line)
 	//case where theres nothing in file ?
 	if (ret != 0 || stack[fd][0] == '\0'  || stack[fd] == NULL)
 	{
-		if (ret == 0 && *line) //and line exist?
-			*line = NULL;
+		/*if (ret == 0 && *line) //and line exist?
+			*line = NULL;*/
 		return (ret);
 	}
 	*line = stack[fd]; //allocating last line
