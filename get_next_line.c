@@ -6,17 +6,72 @@
 /*   By: nmashimb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/06/19 13:42:49 by nmashimb          #+#    #+#             */
-/*   Updated: 2019/06/28 13:15:51 by nmashimb         ###   ########.fr       */
+/*   Updated: 2019/06/29 17:19:01 by nmashimb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-#include <stdio.h>
-#include <fcntl.h> //open
+//#include <stdio.h>
+
+static size_t		ft_strlen(const char *str)
+{
+	size_t len;
+
+	len = 0;
+	while (str[len])
+		len++;
+	return (len);
+}
+
+static char	*ft_strdup(const char *s1)
+{
+	char	*str;
+	int		i;
+
+	i = 0;
+	str = (char *)malloc(ft_strlen(s1) + 1);
+	if (str == NULL)
+		return (0);
+	while (s1[i] != '\0')
+	{
+		str[i] = s1[i];
+		i++;
+	}
+	str[i] = '\0';
+	return (str);
+}
+
+static char	*ft_strjoin(char const *s1, char const *s2)
+{
+	char	*str;
+	size_t	len;
+
+	if (!s1 || !s2)
+		return (NULL);
+	len = ft_strlen(s1) + ft_strlen(s2);
+	str = (char *)malloc(len + 1);
+	if (!str)
+		return (NULL);
+	while (*s1)
+	{
+		*str = *s1;
+		s1++;
+		str++;
+	}
+	while (*s2)
+	{
+		*str = *s2;
+		s2++;
+		str++;
+	}
+	*str = '\0';
+	str = str - len;
+	return (str);
+}
 
 //checks if file has nl (valid). if so, retrives line and stack points to !st chr of next ln
 //works!!
-int		check_nl(char **stack, char **line)
+static	int		check_nl(char **stack, char **line)
 {
 	size_t	i;
 	char	*endof_ln;
@@ -24,7 +79,7 @@ int		check_nl(char **stack, char **line)
 
 	i = 0;
 	nl_pntr = *stack;
-	nl_pntr[(strlen(nl_pntr) - 1)] = '\0'; //added
+	nl_pntr[(ft_strlen(nl_pntr)) - 1] = '\0'; //added
 	while (nl_pntr[i] != '\n')
 	{
 		if (nl_pntr[i] == '\0')
@@ -33,12 +88,12 @@ int		check_nl(char **stack, char **line)
 	}
 	endof_ln = &nl_pntr[i];
 	*endof_ln = '\0';
-	*line = strdup(*stack); //change me
-	*stack = strdup(endof_ln + 1); //change me
+	*line = ft_strdup(*stack);
+	*stack = ft_strdup(endof_ln + 1);
 	return (1);
 }
 
-int		update_stack(int fd, char **stack, char **line, char *buff)
+static	int		update_stack(int fd, char **stack, char **line, char *buff)
 {
 	char	*tmp;
 	int		ret;
@@ -49,12 +104,12 @@ int		update_stack(int fd, char **stack, char **line, char *buff)
 		if (*stack)
 		{
 			tmp = *stack;
-			*stack = ft_strjoin(tmp, buff); //change me
+			*stack = ft_strjoin(tmp, buff);
 			free(tmp);
 			tmp = NULL;
 		}
 		else
-			*stack = strdup(buff); //change me
+			*stack = ft_strdup(buff);
 		if ((check_nl(stack, line)) == 1)
 			break;
 	}
@@ -78,14 +133,17 @@ int		get_next_line(const int fd, char **line)
 			return (1);
 	}
 	//bzero(buff, BUFF_SIZE); //optional?
+	int i = 0;
+	while (i < BUFF_SIZE)
+		buff[i++] = '\0';
 	ret = update_stack(fd, &stack[fd], line, buff); //updates stack: add content with \n
 	free(buff);
 	buff = NULL;
 	//case where theres nothing in file ?
-	if (ret != 0 || stack[fd][0] == '\0'  || stack[fd] == NULL)
+	if (ret != 0 || stack[fd] == NULL ||stack[fd][0] == '\0')
 	{
-		/*if (ret == 0 && *line) //and line exist?
-			*line = NULL;*/
+		if (ret == 0 && *line) //and line exist?
+			*line = NULL;
 		return (ret);
 	}
 	*line = stack[fd]; //allocating last line
@@ -93,7 +151,7 @@ int		get_next_line(const int fd, char **line)
 	return (1);
 }
 
-int		main()
+/*int		main()
 {
 	int fd = open("text.txt", O_RDONLY);
 	char			*line = NULL;
@@ -102,4 +160,4 @@ int		main()
 
 	//printf("%d\n", x);
 	return 0;
-}
+}*/
