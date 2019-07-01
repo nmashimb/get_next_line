@@ -74,12 +74,17 @@ static char	*ft_strjoin(char const *s1, char const *s2)
 static	int		check_nl(char **stack, char **line)
 {
 	size_t	i;
+	//size_t	j;
 	char	*endof_ln;
 	char	*nl_pntr;
 
 	i = 0;
+	//j = 0;
 	nl_pntr = *stack;
-	nl_pntr[(ft_strlen(nl_pntr)) - 1] = '\0'; //added
+	/*while (nl_pntr[j] == '\n')
+		j++;
+	i = j;*/
+	//nl_pntr[(ft_strlen(nl_pntr)) - 1] = '\0'; //added
 	while (nl_pntr[i] != '\n')
 	{
 		if (nl_pntr[i] == '\0')
@@ -89,6 +94,7 @@ static	int		check_nl(char **stack, char **line)
 	endof_ln = &nl_pntr[i];
 	*endof_ln = '\0';
 	*line = ft_strdup(*stack);
+	//*line = ft_strsub(*stack, j, i - j);
 	*stack = ft_strdup(endof_ln + 1);
 	return (1);
 }
@@ -159,5 +165,22 @@ int		get_next_line(const int fd, char **line)
 	int x = get_next_line(fd, &line);
 
 	//printf("%d\n", x);
+	return 0;
+}*/
+
+/*int		main()
+{
+	int fd = open("text.txt", O_RDONLY);
+	char			*line = NULL;
+
+	int count = 1;
+	while(count == 1)
+	{
+		count = get_next_line(fd, &line);
+		printf("%d  %s\n", count,line);
+
+	}
+	putchar(10);
+	printf("%d\n", count);
 	return 0;
 }*/
