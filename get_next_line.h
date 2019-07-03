@@ -6,20 +6,20 @@
 /*   By: nmashimb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/06/25 12:32:38 by nmashimb          #+#    #+#             */
-/*   Updated: 2019/06/29 14:42:36 by nmashimb         ###   ########.fr       */
+/*   Updated: 2019/07/03 17:35:58 by nmashimb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef GET_NEXT_LINE_H
 # define GET_NEXT_LINE_H
 
-#include <string.h>
-#include <stdlib.h> //free/malloc 
-#include <unistd.h> //read
+# include <string.h>
+# include <stdlib.h>
+# include <unistd.h>
 
-#define BUFF_SIZE 32
-#define MAX_FD 1024 + 1
+# define BUFF_SIZE 32
+# define MAX_FD 1024 + 1
 
-int   get_next_line(const int fd, char **line);
+int		get_next_line(const int fd, char **line);
 
 #endif

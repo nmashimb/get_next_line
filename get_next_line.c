@@ -6,7 +6,7 @@
 /*   By: nmashimb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/07/03 10:14:47 by nmashimb          #+#    #+#             */
-/*   Updated: 2019/07/03 16:13:53 by nmashimb         ###   ########.fr       */
+/*   Updated: 2019/07/03 17:36:32 by nmashimb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,7 +129,7 @@ static char	*ft_strjoin(char const *s1, char const *s2)
 
 static	int		ft_get_line(int fd, char **stack, char **line, int ret)
 {
-	char	*hold;
+	char	*tmp;
 	int		i;
 
 	i = 0;
@@ -138,9 +138,9 @@ static	int		ft_get_line(int fd, char **stack, char **line, int ret)
 	if (stack[fd][i] == '\n')
 	{
 		*line = ft_strsub(stack[fd], 0, i);
-		hold = ft_strdup(stack[fd] + i + 1);
+		tmp = ft_strdup(stack[fd] + i + 1);
 		free(stack[fd]);
-		stack[fd] = hold;
+		stack[fd] = tmp;
 	}
 	else if (stack[fd][i] == '\0')
 	{
@@ -152,14 +152,14 @@ static	int		ft_get_line(int fd, char **stack, char **line, int ret)
 	return (1);
 }
 
-int		get_next_line(const int fd, char **line)
+int				get_next_line(const int fd, char **line)
 {
-	static char		*stack[1024 + 1];
+	static char		*stack[MAX_FD];
 	char			buff[BUFF_SIZE];
 	char			*tmp;
 	int				ret;
 
-	if (fd < 0 || line == NULL)
+	if (fd < 0 || fd > MAX_FD || line == NULL || (read(fd, stack[fd], 0) < 0))
 		return (-1);
 	while ((ret = read(fd, buff, BUFF_SIZE)) > 0)
 	{
@@ -178,20 +178,3 @@ int		get_next_line(const int fd, char **line)
 		return (0);
 	return (ft_get_line(fd, stack, line, ret));
 }
-
-/*int		main()
-{
-	int fd = open("text.txt", O_RDONLY);
-	char		*line = NULL;
-	
-	get_next_line(fd, &line);
-	int count = 1;
-	while(count == 1)
-	{
-		count = get_next_line(fd, &line);
-		printf("%d  %s\n", count,line);
-	}
-	
-	printf("%d\n", count);
-	return 0;
-}*/
