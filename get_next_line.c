@@ -5,13 +5,12 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: nmashimb <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/06/19 13:42:49 by nmashimb          #+#    #+#             */
-/*   Updated: 2019/06/29 17:19:01 by nmashimb         ###   ########.fr       */
+/*   Created: 2019/07/03 10:14:47 by nmashimb          #+#    #+#             */
+/*   Updated: 2019/07/03 16:13:53 by nmashimb         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-//#include <stdio.h>
 
 static size_t		ft_strlen(const char *str)
 {
@@ -21,6 +20,65 @@ static size_t		ft_strlen(const char *str)
 	while (str[len])
 		len++;
 	return (len);
+}
+
+static void	ft_strdel(char **as)
+{
+	if (!as)
+		return ;
+	free(*as);
+	*as = NULL;
+}
+
+static char	*ft_strnew(size_t size)
+{
+	size_t	i;
+	char	*str;
+
+	str = (char *)malloc(size + 1);
+	if (str == NULL)
+		return (NULL);
+	i = 0;
+	while (i <= size + 1)
+	{
+		str[i] = 0;
+		i++;
+	}
+	return (str);
+}
+
+static char	*ft_strsub(char const *s, unsigned int start, size_t len)
+{
+	char	*str;
+	size_t	i;
+
+	if (!s)
+		return (0);
+	str = (char *)malloc(len + 1);
+	if (str == NULL)
+		return (NULL);
+	i = 0;
+	while (i < len)
+	{
+		str[i] = s[start + i];
+		i++;
+	}
+	str[i] = '\0';
+	return (str);
+}
+
+static char	*ft_strchr(const char *s, int c)
+{
+	size_t i;
+
+	i = 0;
+	while (s[i] != (char)c)
+	{
+		if (s[i] == '\0')
+			return (NULL);
+		i++;
+	}
+	return ((char *)&s[i]);
 }
 
 static char	*ft_strdup(const char *s1)
@@ -69,118 +127,71 @@ static char	*ft_strjoin(char const *s1, char const *s2)
 	return (str);
 }
 
-//checks if file has nl (valid). if so, retrives line and stack points to !st chr of next ln
-//works!!
-static	int		check_nl(char **stack, char **line)
+static	int		ft_get_line(int fd, char **stack, char **line, int ret)
 {
-	size_t	i;
-	//size_t	j;
-	char	*endof_ln;
-	char	*nl_pntr;
+	char	*hold;
+	int		i;
 
 	i = 0;
-	//j = 0;
-	nl_pntr = *stack;
-	/*while (nl_pntr[j] == '\n')
-		j++;
-	i = j;*/
-	//nl_pntr[(ft_strlen(nl_pntr)) - 1] = '\0'; //added
-	while (nl_pntr[i] != '\n')
-	{
-		if (nl_pntr[i] == '\0')
-			return (0);
+	while (stack[fd][i] != '\n' && stack[fd][i] != '\0')
 		i++;
-	}
-	endof_ln = &nl_pntr[i];
-	*endof_ln = '\0';
-	*line = ft_strdup(*stack);
-	//*line = ft_strsub(*stack, j, i - j);
-	*stack = ft_strdup(endof_ln + 1);
-	return (1);
-}
-
-static	int		update_stack(int fd, char **stack, char **line, char *buff)
-{
-	char	*tmp;
-	int		ret;
-
-	while ((ret = read(fd, buff, BUFF_SIZE)) > 0)
+	if (stack[fd][i] == '\n')
 	{
-		buff[ret] = '\0';
-		if (*stack)
-		{
-			tmp = *stack;
-			*stack = ft_strjoin(tmp, buff);
-			free(tmp);
-			tmp = NULL;
-		}
-		else
-			*stack = ft_strdup(buff);
-		if ((check_nl(stack, line)) == 1)
-			break;
+		*line = ft_strsub(stack[fd], 0, i);
+		hold = ft_strdup(stack[fd] + i + 1);
+		free(stack[fd]);
+		stack[fd] = hold;
 	}
-	if (ret > 0)
-		return (1);
-	return (ret);
+	else if (stack[fd][i] == '\0')
+	{
+		if (ret == BUFF_SIZE)
+			return (get_next_line(fd, line));
+		*line = ft_strdup(stack[fd]);
+		ft_strdel(&stack[fd]);
+	}
+	return (1);
 }
 
 int		get_next_line(const int fd, char **line)
 {
-	static char	*stack[MAX_FD];
-	char		*buff;
-	int 		ret;
+	static char		*stack[1024 + 1];
+	char			buff[BUFF_SIZE];
+	char			*tmp;
+	int				ret;
 
-	if (( fd < 0 || fd > MAX_FD) || (!(buff = (char *)malloc(BUFF_SIZE + 1)))\
-			|| line == NULL || read(fd, stack[fd], 0) < 0) //why stack[fd]
+	if (fd < 0 || line == NULL)
 		return (-1);
-	if (*stack)
+	while ((ret = read(fd, buff, BUFF_SIZE)) > 0)
 	{
-		if ((check_nl(stack, line)) == 1)
-			return (1);
+		buff[ret] = '\0';
+		if (stack[fd] == NULL)
+			stack[fd] = ft_strnew(1);
+		tmp = ft_strjoin(stack[fd], buff);
+		ft_strdel(&stack[fd]);
+		stack[fd] = tmp;
+		if (ft_strchr(buff, '\n'))
+			break ;
 	}
-	//bzero(buff, BUFF_SIZE); //optional?
-	int i = 0;
-	while (i < BUFF_SIZE)
-		buff[i++] = '\0';
-	ret = update_stack(fd, &stack[fd], line, buff); //updates stack: add content with \n
-	free(buff);
-	buff = NULL;
-	//case where theres nothing in file ?
-	if (ret != 0 || stack[fd] == NULL ||stack[fd][0] == '\0')
-	{
-		if (ret == 0 && *line) //and line exist?
-			*line = NULL;
-		return (ret);
-	}
-	*line = stack[fd]; //allocating last line
-	stack[fd] = NULL;
-	return (1);
+	if (ret < 0)
+		return (-1);
+	else if (ret == 0 && (stack[fd] == NULL || stack[fd][0] == '\0'))
+		return (0);
+	return (ft_get_line(fd, stack, line, ret));
 }
 
 /*int		main()
 {
 	int fd = open("text.txt", O_RDONLY);
-	char			*line = NULL;
-
-	int x = get_next_line(fd, &line);
-
-	//printf("%d\n", x);
-	return 0;
-}*/
-
-/*int		main()
-{
-	int fd = open("text.txt", O_RDONLY);
-	char			*line = NULL;
-
+	char		*line = NULL;
+	
+	get_next_line(fd, &line);
 	int count = 1;
 	while(count == 1)
 	{
 		count = get_next_line(fd, &line);
 		printf("%d  %s\n", count,line);
-
 	}
-	putchar(10);
+	
 	printf("%d\n", count);
 	return 0;
 }*/
