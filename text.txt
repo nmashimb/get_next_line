@@ -1,4 +1,0 @@
-hello, i am line one
-my name is line two
-i am line three, and i come third
-i am the forth line, the last line.
